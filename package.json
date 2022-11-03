@@ -1,0 +1,23 @@
+{
+  "name": "file-organization-system",
+  "version": "0.1.0",
+  "description": "A system for organizing pictures by tag",
+  "main": "App.js",
+  "dependencies": {
+    "color-namer": "^1.4.0",
+    "dialogs": "^2.0.1",
+    "electron": "^2.0.6",
+    "electron-debug": "^3.0.1",
+    "get-image-colors": "^4.0.0",
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {
+    "electron-packager": "^12.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"electron App.js"
+  },
+  "author": "AirmanEpic",
+  "license": "ISC"
+}

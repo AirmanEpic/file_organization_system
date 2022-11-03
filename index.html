@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tag Organization system</title>
+	<link rel="stylesheet" type="text/css" href="main.css">
+	<script src="jquery-2.1.4.min.js"></script>
+</head>
+<body>
+	<nav>
+	<div class="navunder">
+		<div class="tagarea"></div>
+		<div class="controlbar"><h3>Search:</h3><input class='searchstr'><p class='countbox'></p></div>
+		
+		<div class='searcharea'>
+			
+		</div>
+		<div class="settingsbar controlbar">
+			<div class="settingsbut"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
+		</div>
+	</div></nav>
+	<div class="gamebox" style="height:100%">
+		<div class="bigbox">
+			<div class="gamecontenthere">
+
+				<div class="subimgholder">
+
+					<img class="centimg" draggable="false" style="height: 100%;"></div>
+				<div class="overbox">
+					<canvas id="timeline" width=200 height=200></canvas>
+					<div class="chevron left"></div>
+					<div class="chevron right"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer>
+		<div class="footerunder" style='position: relative'>
+			<h3 class='filelocation' style='margin-left:5%'>Sample FL</h3>
+			<div class="controlbar"><h3>Tags:</h3><input class='curtags'></div>
+			<div class='checkboxContainer' style='margin-top:10px; margin-right:10%;'><div class='checkbox starImg' style='font-size:40px'></div><p>Favorite</p></div>
+		
+	</div>	
+	
+	<div class='checkboxContainer' style='position:absolute; right:12px; top:12px'><p>Pin menu</p> <div class='checkbox pinLower' style='margin-left:10px;'></div></div>
+	</footer>
+</body>
+<script type="text/javascript" src="std_code.js"></script>
+<script type="text/javascript" src="inapp.js"></script>
+</html>
