@@ -1,1 +1,12 @@
 node_modules/*
+affinities.JSON
+alltags.json
+*.zip
+imgColors.json
+latest_view.json
+savedSearches.json
+tags.json
+target.json
+*.sublime-project
+*.sublime-workspace
+*.png
