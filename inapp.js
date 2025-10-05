@@ -414,6 +414,47 @@ var main=function(){
 		rapidMode = arg
 	})
 
+	e.ipcRenderer.on("open", function(event,arg){
+		//see if the tags file exists for this
+		//if it does, load the tags 
+		//if not, create the tag in the tag file
+		//then load the tags
+
+		//when a file is loaded this way, the containing folder is 
+		console.log("Received open command")
+		id = -1
+		filename = arg.split("\\")[arg.split("\\").length-1]
+		console.log("Filename is: ",filename)
+		folders = arg.split("\\")
+		folders = folders.slice(folders.length-2,folders.length-1)
+		folders = folders.join("/")
+		console.log("Folders: ",folders)
+		$('.searchstr').val("folder:"+folders.split(" ")[0]+" sortby:date")
+		sort_and_display_2($('.searchstr')[0])
+
+
+		for (var i=0; i<currentfiles.length; i++){
+			//if the currentfiles[i].loc (which is a string) contains the substring filename, then we have a match
+			if (currentfiles[i].loc.indexOf(filename) != -1){
+				id = i;
+				break;
+			}
+		}
+
+		console.log("ID found: ",id," for ",arg," in ",currentfiles)
+
+		//this is a known file. load it
+		if (id != -1){
+			current_index = id;
+			load_id(id);
+			//change the search settings so that the folder of the file is in the search
+			//get the last 2 folders of the file
+			return;
+		}
+
+
+	})
+
 	loop();
 }
 
@@ -769,6 +810,7 @@ function load_id(id)
 	$('.filelocation').click(function(){
 		currentLoc = $(this).text()
 		child_process.exec(`start "" "${currentLoc}"`)
+		//TODO: change this to open the image in a new window. 
 	})
 	w = $('.filelocation').width();
 	$('.balancer').css({width:w+"px",height:"1px"})

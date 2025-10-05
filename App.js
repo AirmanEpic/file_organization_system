@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain, dialog} = require('electron')
+const {app, BrowserWindow, ipcMain, dialog, screen} = require('electron')
 
 var fs = require('fs');
 const getColors = require('get-image-colors')
@@ -9,13 +9,7 @@ var curColors = {}
 
 resolve = require('path').resolve
 
-if (fs.existsSync("imgColors.json")){
-	readColors()
-}else{
-	console.log("Created blank imgColors.")
-	console.log("Parsing the imgcolors will take a long time this run!")
-	writeColors()
-}
+
 
 rejectList = [
 	"../charecters/fatasy/demia_by_drakarra-dcljlr1.png",
@@ -27,31 +21,7 @@ rejectList = [
 	"../charecters/fatasy/mermay_by_ryumo-dcbssnr.png"
 ]
 
-fs.readFile('target.json', 'utf8', function (err,data) {
-	if (err) 
-	{
-		fs.open("target.json","w",function(erro,file){
-			if (erro) throw erro
-			console.log("saved!");
-		})
-		fs.writeFile("target.json","dummy",function (err) 
-			{
-				if (err) throw err;
-				console.log('Replaced!')
-			})
-	}
-	else
-	{
-		//open it and read it. 
-		target = data;
 
-		files = fs.readdirSync(target);
-		filelist = walk(target)
-		console.log("filelist saved")
-
-		global.filedata = filelist;
-	}
-});
 
 async function generateColors(fl){
 	readColors()
@@ -119,7 +89,16 @@ function readColors(){
 	curColors = JSON.parse(fs.readFileSync('imgColors.json').toString())
 }
 
-var files = fs.readdirSync(target);
+function establish_files(){
+	if (target == "dummy")
+	return
+
+	var files = fs.readdirSync(target);
+
+	filelist = walk(target)
+}
+
+establish_files()
 
 var filelist = []
 
@@ -135,42 +114,74 @@ var walk = function(dir) {
     return results
 }
 
-filelist = walk(target)
-
 //locate old tags.json
 var tagdata = {}
 
-fs.readFile('tags.json', 'utf8', function (err,data) {
-	if (err) 
-	{
-		//no file exists
-		global.tagdata = [];
-		fs.open("tags.json","w",function(erro,file){
-			if (erro) throw erro
-			console.log("saved!");
-		})
-		fs.writeFile("tags.json","{}",function (err) 
-			{
-				if (err) throw err;
-				console.log('Replaced!')
-			})
-	}
-	else
-	{
-		//open it and read it. 
-		tagdata = JSON.parse(data);
-		//console.log("tagdata: "+data)
-		//win.webContents.send("new_tagdata",tagdata)
-	}
-});
-
 global.filedata = filelist;
-
-setTimeout(function(){generateColors(filelist)},500)
 
 require('electron-debug')();
 
-function createWindow(){
+let mainWindow = false
+
+function createMainWindow(){
+	if (fs.existsSync("imgColors.json")){
+		readColors()
+	}else{
+		console.log("Created blank imgColors.")
+		console.log("Parsing the imgcolors will take a long time this run!")
+		writeColors()
+	}
+	fs.readFile('target.json', 'utf8', function (err,data) {
+		if (err) 
+		{
+			fs.open("target.json","w",function(erro,file){
+				if (erro) throw erro
+				console.log("saved!");
+			})
+			fs.writeFile("target.json","dummy",function (err) 
+				{
+					if (err) throw err;
+					console.log('Replaced!')
+				})
+		}
+		else
+		{
+			//open it and read it. 
+			target = data;
+	
+			files = fs.readdirSync(target);
+			filelist = walk(target)
+			console.log("filelist saved")
+	
+			global.filedata = filelist;
+		}
+	});
+	fs.readFile('tags.json', 'utf8', function (err,data) {
+		if (err) 
+		{
+			//no file exists
+			global.tagdata = [];
+			fs.open("tags.json","w",function(erro,file){
+				if (erro) throw erro
+				console.log("saved!");
+			})
+			fs.writeFile("tags.json","{}",function (err) 
+				{
+					if (err) throw err;
+					console.log('Replaced!')
+				})
+		}
+		else
+		{
+			//open it and read it. 
+			tagdata = JSON.parse(data);
+			//console.log("tagdata: "+data)
+			//win.webContents.send("new_tagdata",tagdata)
+		}
+	});
+
+	setTimeout(function(){generateColors(filelist)},500)
+
 	win = new BrowserWindow({width: 800, height: 600, webPreferences: {devTools: true, nodeIntegration: true, contextIsolation: false}})
 
 	win.setMenu(null)
@@ -179,7 +190,53 @@ function createWindow(){
 
 	win.maximize();
 
-	
+	return win
+}
+
+function createMainWindowToAddr(addr){
+	let win = ""
+	if (!mainWindow){
+		win = createMainWindow()
+		
+	}else{
+		win = mainWindow
+	}
+
+	setTimeout(function(){
+		console.log("Sent load to main window.")
+		win.webContents.send("open",addr)
+	}, 5000)
+}
+
+function createViewWindow(addr){
+	win = new BrowserWindow({width: 800, height: 600, webPreferences: {devTools: false, nodeIntegration: true, contextIsolation: false}})
+
+	win.setMenu(null)
+
+	console.log("Got request to open file ",addr)
+
+	win.loadFile('subwindow.html')
+
+	//set window size to screen size without .maximize()
+	screenw = screen.getPrimaryDisplay().workAreaSize.width
+	screenh = screen.getPrimaryDisplay().workAreaSize.height
+	win.setSize(screenw,screenh)
+
+	win.webContents.on('did-finish-load', () => {
+		win.webContents.send("load",addr)
+	})
+
+	//wait for the requestResize call from the subwindow
+	ipcMain.on("requestResize",function(event,arg){
+		//resize window to arg.ww and arg.hh
+		console.log("Resizing window to ",arg.width,arg.height)
+		win.setSize(arg.width,arg.height)
+	})
+
+	ipcMain.on("openoutside",function(event,arg){
+		console.log("Got IPCMain command")
+		createMainWindowToAddr(arg)
+	})
 }
 
 function parseColors(file){
@@ -292,4 +349,16 @@ ipcMain.on("requestSaveFav",(event)=>{
 	}
 })
 
-setTimeout(createWindow,100)
+setTimeout(checkstatus,100)
+
+function checkstatus(){
+	//check arguments presented to window
+	if (process.argv.length > 2){
+		//if there is an argument, it's a target folder or file. 
+		target = process.argv[2]
+		console.log("Target: "+target)
+		createViewWindow(target)
+	}else{
+		mainWindow = createMainWindow()
+	}
+}

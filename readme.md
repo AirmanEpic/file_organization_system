@@ -52,3 +52,9 @@ Sorting: you can also sort your matches
  - sortby:view_old shows images in the order latest viewed (IE an image that you see will be next)
 
  
+
+ todo:
+
+ - fix the reliance on "Dummy" existing
+
+ - add a zoom wheel reverser

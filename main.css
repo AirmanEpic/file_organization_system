@@ -456,11 +456,13 @@ footer {
 .subimgholder{
   position:absolute;
   height: 100%;
+}
+
+.spec{
   top: 50%;
   left: 50%;
 
   transform:translate(-50%,-50%);
-
 }
 
 .gamecontenthere p{
@@ -837,4 +839,21 @@ h4{
   left:0;
   top:0;
   z-index:1000;
+}
+
+.button{
+  border:1px solid #1b1b1b;
+  background-color:#424242;
+  border-radius:10px;
+  padding:10px 20px;
+  transition:0.3s;
+  cursor:pointer;
+}
+
+.button p{
+  text-transform: uppercase;
+}
+
+.button:hover{
+  background-color:rgb(200,200,200)
 }
